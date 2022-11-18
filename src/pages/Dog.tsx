@@ -74,7 +74,6 @@ const BreedSelectorBox = () => {
   };
   useEffect(() => {
     getBreed("bulldog");
-    console.log(specific);
   }, [selectBreeds]);
   //onchange
   const handleChange = (event: SelectChangeEvent<unknown>) => {
