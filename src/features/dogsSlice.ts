@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../app/store';
-import { getDogs, Dogs, getBreeds, Breeds } from './api';
+import { getDogs, Dogs, getBreeds, Breeds, getSubBreed } from './api';
 
 export interface InitialState {
   allBreeds: Dogs
   status: 'idle' | 'loading' | 'failed';
   availableBreeds: Breeds[];
   success: boolean;
+  subBreed: Dogs
 }
 
 const initialState: InitialState = {
@@ -16,7 +17,11 @@ const initialState: InitialState = {
   },
   status: 'idle',
   availableBreeds: [],
-  success: false
+  success: false,
+  subBreed: {
+    message: {},
+    status: ''
+  }
 };
 
 
@@ -37,20 +42,17 @@ export const fetchBreeds = createAsyncThunk(
   }
 );
 
+export const fetchSubBreed = createAsyncThunk('dogs/getBreeds/sub_breed',
+  async (breed: string) => {
+    const response = await getSubBreed(breed)
+    return response;
+  });
+
 export const dogsSlice = createSlice({
   name: 'dogs',
   initialState,
   reducers: {
-    recievedDogs(state, action: PayloadAction<Dogs[]>) {
-      // store products in varable;
-      const dogs = action.payload
-      // convert an arr to obj
-      dogs.forEach(dog => {
-
-        // state.products[product.id] = product;
-      })
-
-    }
+    recievedDogs(state, action: PayloadAction<Dogs[]>) { }
   },
 
   extraReducers: (builder) => {
@@ -82,6 +84,20 @@ export const dogsSlice = createSlice({
       .addCase(fetchBreeds.rejected, (state) => {
         state.status = 'failed';
         state.availableBreeds = []
+      })
+      .addCase(fetchSubBreed.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchSubBreed.fulfilled, (state, action: PayloadAction<Dogs>) => {
+        state.status = 'idle';
+        state.subBreed = action.payload
+      })
+      .addCase(fetchSubBreed.rejected, (state) => {
+        state.status = 'failed';
+        state.subBreed = {
+          message: {},
+          status: 'failed'
+        };
       })
   },
 });

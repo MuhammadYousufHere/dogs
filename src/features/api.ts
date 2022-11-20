@@ -9,7 +9,7 @@ export interface Breeds {
   key: string;
   value: string[]
 }
-interface ImageResponse {
+export interface ImageResponse {
   message: string[];
 }
 
@@ -37,9 +37,11 @@ export const getBreeds = async (allBreeds: Dogs): Promise<Breeds[]> => {
   return dogBreeds
 }
 
-export const getSubBreed = async (key: string) => {
-  const { data } = await axios.get(
-    `https://dog.ceo/api/breed/${encodeURI(key)}/images`
-  );
-  return data
+export const getSubBreed = async (breed: string) => {
+  return await new Promise<Dogs>(async (resolve, reject) => {
+    const { data } = await axios.get(
+      `https://dog.ceo/api/breed/${encodeURI(breed)}/list`
+    );
+    resolve(data)
+  })
 };
