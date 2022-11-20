@@ -1,15 +1,22 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../app/store';
-import { getDogs, Dogs } from './api';
+import { getDogs, Dogs, getBreeds, Breeds } from './api';
 
 export interface InitialState {
-  allBreeds: {};
+  allBreeds: Dogs
   status: 'idle' | 'loading' | 'failed';
+  availableBreeds: Breeds[];
+  success: boolean;
 }
 
 const initialState: InitialState = {
-  allBreeds: {},
+  allBreeds: {
+    message: {},
+    status: ''
+  },
   status: 'idle',
+  availableBreeds: [],
+  success: false
 };
 
 
@@ -17,6 +24,14 @@ export const getAllBreeds = createAsyncThunk(
   'dogs/fetchDogs',
   async () => {
     const response = await getDogs();
+    return response
+
+  }
+);
+export const fetchBreeds = createAsyncThunk(
+  'dogs/getBreeds',
+  async (allData: Dogs) => {
+    const response = await getBreeds(allData);
     return response
 
   }
@@ -42,15 +57,32 @@ export const dogsSlice = createSlice({
     builder
       .addCase(getAllBreeds.pending, (state) => {
         state.status = 'loading';
+        state.success = false
       })
-      .addCase(getAllBreeds.fulfilled, (state, action: PayloadAction<Dogs[]>) => {
+      .addCase(getAllBreeds.fulfilled, (state, action: PayloadAction<Dogs>) => {
         state.status = 'idle';
-        state.allBreeds = action.payload
+        state.allBreeds = action.payload;
+        state.success = true
       })
       .addCase(getAllBreeds.rejected, (state) => {
         state.status = 'failed';
-        state.allBreeds = {}
-      });
+        state.allBreeds = {
+          message: {},
+          status: 'failed'
+        };
+        state.success = false
+      })
+      .addCase(fetchBreeds.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchBreeds.fulfilled, (state, action) => {
+        state.status = 'idle';
+        state.availableBreeds = action.payload
+      })
+      .addCase(fetchBreeds.rejected, (state) => {
+        state.status = 'failed';
+        state.availableBreeds = []
+      })
   },
 });
 
