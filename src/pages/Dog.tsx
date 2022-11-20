@@ -7,20 +7,19 @@ import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   fetchBreeds,
   fetchSubBreed,
+  fetchSubBreedImages,
   getAllBreeds,
 } from '../features/dogsSlice';
 import SubBreed from './SubBreeds';
-import { Dogs } from '../features/api';
 
 const BreedSelectorBox = () => {
-  const [selectBreeds, setSelectBreeds] = useState<string>('');
+  const [selectBreed, setSelectBreed] = useState<string>('');
   const [selectSubBreed, setSelectSubBreed] = useState<string>('');
   const [selectedBreed, setSelectedSubBreed] = useState<any[]>([]);
 
   const dispatch = useAppDispatch();
-  const { allBreeds, availableBreeds, subBreed, success } = useAppSelector(
-    (state) => state.dogs
-  );
+  const { allBreeds, availableBreeds, subBreed, success, subBreedImages } =
+    useAppSelector((state) => state.dogs);
 
   useEffect(() => {
     dispatch(getAllBreeds());
@@ -32,19 +31,26 @@ const BreedSelectorBox = () => {
     setSelectedSubBreed(Object.values(subBreed.message));
   }, [subBreed]);
   //onchange
-  const handleChange = (event: SelectChangeEvent<unknown>) => {
-    setSelectBreeds(event.target.value as string);
-    dispatch(fetchSubBreed(event.target.value as string));
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    setSelectBreed(event.target.value);
+    dispatch(fetchSubBreed(event.target.value));
   };
-  const handleSubBreedChange = (event: SelectChangeEvent<unknown>) => {
-    setSelectSubBreed(event.target.value as string);
+  const handleSubBreedChange = (event: SelectChangeEvent<string>) => {
+    setSelectSubBreed(event.target.value);
   };
+  const fetchImages = () =>
+    dispatch(
+      fetchSubBreedImages({
+        breed: selectBreed,
+        subBreed: selectSubBreed,
+      })
+    );
   return (
     <>
       <Box style={{ display: 'flex', width: '100%', gap: '1rem' }}>
         <Breed
           data={availableBreeds ?? availableBreeds}
-          value={selectBreeds}
+          value={selectBreed}
           name='breed'
           handleChange={handleChange}
         />
@@ -55,7 +61,17 @@ const BreedSelectorBox = () => {
           handleChange={handleSubBreedChange}
         />
 
-        <Button variant='contained'>+</Button>
+        <Button
+          variant='contained'
+          onClick={fetchImages}
+          disabled={selectBreed && selectSubBreed ? false : true}
+        >
+          +
+        </Button>
+      </Box>
+      <Box>
+        {subBreedImages.message.length ? subBreedImages.message.length : 0}{' '}
+        Images Available
       </Box>
     </>
   );

@@ -5,9 +5,10 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Breeds } from '../features/api';
+import { capitalize } from '../util';
 
 interface Props {
-  handleChange: (event: SelectChangeEvent<unknown>) => void;
+  handleChange: (event: SelectChangeEvent<string>) => void;
   value: string;
   data: Breeds[];
   name: string;
@@ -32,7 +33,7 @@ const Breed: React.FC<Props> = (props) => {
               key={item.key}
               value={item?.key}
             >
-              {item?.key.toUpperCase()}
+              {capitalize(item?.key)}
             </MenuItem>
           ))}
         </Select>

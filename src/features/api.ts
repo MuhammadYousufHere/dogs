@@ -12,6 +12,10 @@ export interface Breeds {
 export interface ImageResponse {
   message: string[];
 }
+export interface Params {
+  breed: string,
+  subBreed: string,
+}
 
 const URL = "https://dog.ceo/api/breeds/list/all";
 
@@ -41,6 +45,19 @@ export const getSubBreed = async (breed: string) => {
   return await new Promise<Dogs>(async (resolve, reject) => {
     const { data } = await axios.get(
       `https://dog.ceo/api/breed/${encodeURI(breed)}/list`
+    );
+    resolve(data)
+  })
+};
+
+interface RetrieveImagesResponse {
+  message: [key: string],
+  status: string;
+}
+export const getSubBreedImages = async (breed: string, subBreed: string) => {
+  return await new Promise<Dogs>(async (resolve, reject) => {
+    const { data } = await axios.get(
+      `https://dog.ceo/api/breed/${encodeURI(breed)}/${encodeURI(subBreed)}/images`
     );
     resolve(data)
   })

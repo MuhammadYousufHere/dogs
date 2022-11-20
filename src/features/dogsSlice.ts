@@ -1,13 +1,14 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../app/store';
-import { getDogs, Dogs, getBreeds, Breeds, getSubBreed } from './api';
+import { getDogs, Dogs, getBreeds, Breeds, getSubBreed, getSubBreedImages, Params } from './api';
 
 export interface InitialState {
   allBreeds: Dogs
   status: 'idle' | 'loading' | 'failed';
   availableBreeds: Breeds[];
   success: boolean;
-  subBreed: Dogs
+  subBreed: Dogs;
+  subBreedImages: Dogs
 }
 
 const initialState: InitialState = {
@@ -19,6 +20,10 @@ const initialState: InitialState = {
   availableBreeds: [],
   success: false,
   subBreed: {
+    message: {},
+    status: ''
+  },
+  subBreedImages: {
     message: {},
     status: ''
   }
@@ -45,6 +50,13 @@ export const fetchBreeds = createAsyncThunk(
 export const fetchSubBreed = createAsyncThunk('dogs/getBreeds/sub_breed',
   async (breed: string) => {
     const response = await getSubBreed(breed)
+    return response;
+  });
+
+
+export const fetchSubBreedImages = createAsyncThunk('dogs/getBreeds/sub_breed/images',
+  async (params: Params) => {
+    const response = await getSubBreedImages(params.breed, params.subBreed)
     return response;
   });
 
@@ -97,7 +109,21 @@ export const dogsSlice = createSlice({
         state.subBreed = {
           message: {},
           status: 'failed'
-        };
+        }
+      })
+      .addCase(fetchSubBreedImages.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchSubBreedImages.fulfilled, (state, action: PayloadAction<Dogs>) => {
+        state.status = 'idle';
+        state.subBreedImages = action.payload
+      })
+      .addCase(fetchSubBreedImages.rejected, (state) => {
+        state.status = 'failed';
+        state.subBreedImages = {
+          message: {},
+          status: 'failed'
+        }
       })
   },
 });
